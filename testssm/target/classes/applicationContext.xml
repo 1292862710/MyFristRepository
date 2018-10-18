@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context-4.1.xsd
+	http://www.springframework.org/schema/tx 
+	http://www.springframework.org/schema/tx/spring-tx-4.1.xsd">
+	
+	<!-- 自动扫描所有包下面的注解 -->
+	<context:component-scan base-package="com.lanou.testssm.*"/>
+	
+	<!-- 连接池 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+        destroy-method="close">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+        <property name="url" value="jdbc:mysql://localhost:3306/db?useUnicode=true&amp;characterEncoding=utf-8" />
+        <property name="username" value="root" />
+        <property name="password" value="1234" />
+	</bean>
+	
+	<!-- 配置mybatis的属性 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!-- 给包里面所有的javabean中的类取别名,别名默认是类名 -->
+		<property name="typeAliasesPackage" value="com.lanou.testssm.domain"/>
+		<!-- 引用连接池 -->
+		<property name="dataSource" ref="dataSource" />
+		<!-- 载入mybatis-config.xml -->
+		<property name="configLocation" value="classpath:mybatis-config.xml"/>
+		<!-- 载入映射文件,在src/main/resource下面新建一个mapper文件夹 -->
+		<property name="mapperLocations" value="classpath:mapper/*Mapper.xml"/>
+	</bean>	
+	
+	<!-- 扫描映射器 Mapper,等同于以前的接口实例化,会自动实例化com.lanou.testssm.mapper包下面的所有接口 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- Mapper接口所在包名，Spring会自动查找其下的Mapper -->
+		<property name="basePackage" value="com.lanou.testssm.mapper" />
+	<!-- 		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" /> -->
+	</bean>
+	
+	<!-- 事务处理 -->
+	<!-- 事务管理器 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<!-- 开启事务注解 -->
+	<tx:annotation-driven transaction-manager="transactionManager" />
+</beans>

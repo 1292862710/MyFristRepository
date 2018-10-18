@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lanou.testssm.mapper.BookMapper">
+	<resultMap type="Book" id="bookMap">
+		<id column="t_bookid" property="bookid" javaType="String" jdbcType="VARCHAR"/>
+		<result column="t_bookname" property="bookname" javaType="String" jdbcType="VARCHAR"/>
+		<result column="t_bookprice" property="bookprice" javaType="double" jdbcType="DOUBLE"/>
+		<result column="t_bookimg" property="bookimg" javaType="String" jdbcType="VARCHAR"/>
+	</resultMap>
+	<!-- 分页查询 -->
+	<select id="pageShow" parameterType="int" resultMap="bookMap">
+		select 
+			t_bookid,t_bookname,t_bookprice,t_bookimg
+		from 
+			t_book
+		limit #{pageIndex},3
+	</select>
+	<!-- 得到总书籍数 -->
+	<select id="getAllBookNum" resultType="int">
+		select 
+			count(*)
+		from 
+			t_book
+	</select>
+	<!-- 添加书籍 -->
+	<insert id="saveBook" parameterType="Book">
+		insert into
+			t_book	
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bookid != null">
+				t_bookid,
+			</if>
+			<if test="bookname != null">
+				t_bookname,
+			</if>
+			<if test="bookprice != 0">
+				t_bookprice,
+			</if>
+			<if test="bookimg != null">
+				t_bookimg
+			</if>
+		</trim>
+		values
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="bookid != null">
+				#{bookid},
+			</if>
+			<if test="bookname != null">
+				#{bookname},
+			</if>
+			<if test="bookprice != 0">
+				#{bookprice},
+			</if>
+			<if test="bookimg != null">
+				#{bookimg}
+			</if>
+		</trim>
+	</insert>
+	<!-- 删除书籍 -->
+	<delete id="deleteBook" parameterType="Book">
+		delete from 
+			t_book
+		<where>
+			<if test="bookid != null">
+				t_bookid=#{bookid}
+			</if>
+			<if test="bookname != null">
+				and t_bookname=#{bookname}
+			</if>
+			<if test="bookprice != 0">
+				and t_bookprice=#{bookprice}
+			</if>
+			<if test="bookimg != null">
+				and t_bookimg=#{bookimg}
+			</if>
+		</where>
+	</delete>
+	<!-- 修改书籍 -->
+	<update id="updateBook" parameterType="Book">
+		update 
+			t_book
+		<set>
+			<if test="bookname != null">
+				t_bookname=#{bookname},
+			</if>
+			<if test="bookprice != 0">
+				t_bookprice=#{bookprice},
+			</if>
+			<if test="bookimg != null">
+				t_bookimg=#{bookimg}
+			</if>
+		</set>
+		where 
+			t_bookid=#{bookid}
+	</update>
+</mapper>
